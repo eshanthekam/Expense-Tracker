@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getUserExpenses, addExpense, updateExpense, deleteExpense, getExpenseStats, formatCurrency } from '../../firebase/expenses'
+import { getUserExpenses, addExpense, updateExpense, deleteExpense, getExpenseStats } from '../../firebase/expenses'
+import { formatCurrency } from '../../utils/expenseUtils'
 import ExpenseForm from '../expenses/ExpenseForm'
 import ExpenseList from '../expenses/ExpenseList'
 

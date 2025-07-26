@@ -6,8 +6,7 @@ import {
   doc, 
   query, 
   where, 
-  orderBy, 
-  getDocs,
+  getDocs, 
   serverTimestamp 
 } from 'firebase/firestore'
 import { db } from './config'
@@ -33,6 +32,7 @@ export const addExpense = async (userId, expenseData) => {
       }
     }
   } catch (error) {
+    console.error('Error adding expense:', error)
     return {
       success: false,
       error: error.message
@@ -50,10 +50,10 @@ export const updateExpense = async (expenseId, updatedData) => {
     })
     
     return {
-      success: true,
-      expenseId
+      success: true
     }
   } catch (error) {
+    console.error('Error updating expense:', error)
     return {
       success: false,
       error: error.message
@@ -64,9 +64,14 @@ export const updateExpense = async (expenseId, updatedData) => {
 // Delete an expense
 export const deleteExpense = async (expenseId) => {
   try {
-    await deleteDoc(doc(db, 'expenses', expenseId))
-    return { success: true }
+    const expenseRef = doc(db, 'expenses', expenseId)
+    await deleteDoc(expenseRef)
+    
+    return {
+      success: true
+    }
   } catch (error) {
+    console.error('Error deleting expense:', error)
     return {
       success: false,
       error: error.message
@@ -77,10 +82,12 @@ export const deleteExpense = async (expenseId) => {
 // Get all expenses for a user
 export const getUserExpenses = async (userId) => {
   try {
+    console.log('Fetching expenses for user:', userId)
+    
+    // Remove orderBy to avoid index issues, we'll sort in JavaScript
     const q = query(
       collection(db, 'expenses'),
-      where('userId', '==', userId),
-      orderBy('date', 'desc')
+      where('userId', '==', userId)
     )
     
     const querySnapshot = await getDocs(q)
@@ -96,11 +103,17 @@ export const getUserExpenses = async (userId) => {
       })
     })
     
+    // Sort by date in JavaScript (newest first)
+    expenses.sort((a, b) => new Date(b.date) - new Date(a.date))
+    
+    console.log('Fetched expenses:', expenses.length, expenses)
+    
     return {
       success: true,
       expenses
     }
   } catch (error) {
+    console.error('Error fetching expenses:', error)
     return {
       success: false,
       error: error.message,
@@ -109,50 +122,37 @@ export const getUserExpenses = async (userId) => {
   }
 }
 
-// Get expense statistics
+// Get expense statistics for a user
 export const getExpenseStats = async (userId) => {
   try {
     const result = await getUserExpenses(userId)
-    
     if (!result.success) {
       return result
     }
     
     const expenses = result.expenses
-    const total = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0)
+    const total = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0)
     
-    const byCategory = expenses.reduce((acc, exp) => {
-      const category = exp.category || 'Other'
-      acc[category] = (acc[category] || 0) + parseFloat(exp.amount)
-      return acc
-    }, {})
-    
-    const byMonth = expenses.reduce((acc, exp) => {
-      const date = new Date(exp.date)
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      acc[monthKey] = (acc[monthKey] || 0) + parseFloat(exp.amount)
-      return acc
-    }, {})
+    const byCategory = {}
+    expenses.forEach(expense => {
+      const category = expense.category || 'Other'
+      byCategory[category] = (byCategory[category] || 0) + parseFloat(expense.amount)
+    })
     
     return {
       success: true,
       stats: {
         total: total.toFixed(2),
-        byCategory,
-        byMonth,
-        count: expenses.length
+        count: expenses.length,
+        byCategory
       }
     }
   } catch (error) {
+    console.error('Error calculating stats:', error)
     return {
       success: false,
       error: error.message,
-      stats: {
-        total: '0.00',
-        byCategory: {},
-        byMonth: {},
-        count: 0
-      }
+      stats: { total: '0.00', count: 0, byCategory: {} }
     }
   }
-} 
+}

@@ -16,10 +16,12 @@ const Dashboard = ({ user }) => {
   }, [user])
 
   const loadExpenses = async () => {
+    console.log("Loading expenses for user:", user.uid)
     setLoading(true)
     try {
       const result = await getUserExpenses(user.uid)
       if (result.success) {
+        console.log("Expenses loaded successfully:", result.expenses)
         setExpenses(result.expenses)
         
         // Load stats
@@ -38,6 +40,7 @@ const Dashboard = ({ user }) => {
   const handleAddExpense = async (expenseData) => {
     const result = await addExpense(user.uid, expenseData)
     if (result.success) {
+        console.log("Expenses loaded successfully:", result.expenses)
       await loadExpenses()
       setShowForm(false)
     } else {
@@ -48,6 +51,7 @@ const Dashboard = ({ user }) => {
   const handleUpdateExpense = async (expenseData) => {
     const result = await updateExpense(editingExpense.id, expenseData)
     if (result.success) {
+        console.log("Expenses loaded successfully:", result.expenses)
       await loadExpenses()
       setEditingExpense(null)
       setShowForm(false)
@@ -60,6 +64,7 @@ const Dashboard = ({ user }) => {
     if (window.confirm('Are you sure you want to delete this expense?')) {
       const result = await deleteExpense(expenseId)
       if (result.success) {
+        console.log("Expenses loaded successfully:", result.expenses)
         await loadExpenses()
       } else {
         alert('Error deleting expense: ' + result.error)

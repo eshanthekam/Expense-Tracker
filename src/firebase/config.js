@@ -5,9 +5,9 @@ import { getFirestore } from 'firebase/firestore'
 // Your Firebase configuration
 // Replace this with your actual Firebase config from the Firebase Console
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-project-id.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
+  apiKey: "AIzaSyC51YoKwQahCb0wl4rF_ft75i5ASYTTFHY",
+  authDomain: "expense-tracker-web-24c1c.firebaseapp.com",
+  projectId: "expense-tracker-web-24c1c",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-project-id.appspot.com",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-messaging-sender-id",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id"

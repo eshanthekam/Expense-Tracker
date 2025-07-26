@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getUserExpenses, addExpense, updateExpense, deleteExpense, getExpenseStats, formatCurrency } from '../../utils/expenseUtils'
+import { getUserExpenses, addExpense, updateExpense, deleteExpense, getExpenseStats, formatCurrency } from '../../firebase/expenses'
 import ExpenseForm from '../expenses/ExpenseForm'
 import ExpenseList from '../expenses/ExpenseList'
 
@@ -8,39 +8,60 @@ const Dashboard = ({ user }) => {
   const [stats, setStats] = useState({ total: '0.00', count: 0, byCategory: {} })
   const [showForm, setShowForm] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadExpenses()
   }, [user])
 
-  const loadExpenses = () => {
-    const userExpenses = getUserExpenses(user.id)
-    setExpenses(userExpenses)
-    setStats(getExpenseStats(userExpenses))
-  }
-
-  const handleAddExpense = (expenseData) => {
-    const newExpense = addExpense(user.id, expenseData)
-    if (newExpense) {
-      loadExpenses()
-      setShowForm(false)
+  const loadExpenses = async () => {
+    setLoading(true)
+    try {
+      const result = await getUserExpenses(user.uid)
+      if (result.success) {
+        setExpenses(result.expenses)
+        
+        // Load stats
+        const statsResult = await getExpenseStats(user.uid)
+        if (statsResult.success) {
+          setStats(statsResult.stats)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading expenses:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleUpdateExpense = (expenseData) => {
-    const updatedExpense = updateExpense(user.id, editingExpense.id, expenseData)
-    if (updatedExpense) {
-      loadExpenses()
+  const handleAddExpense = async (expenseData) => {
+    const result = await addExpense(user.uid, expenseData)
+    if (result.success) {
+      await loadExpenses()
+      setShowForm(false)
+    } else {
+      alert('Error adding expense: ' + result.error)
+    }
+  }
+
+  const handleUpdateExpense = async (expenseData) => {
+    const result = await updateExpense(editingExpense.id, expenseData)
+    if (result.success) {
+      await loadExpenses()
       setEditingExpense(null)
       setShowForm(false)
+    } else {
+      alert('Error updating expense: ' + result.error)
     }
   }
 
-  const handleDeleteExpense = (expenseId) => {
+  const handleDeleteExpense = async (expenseId) => {
     if (window.confirm('Are you sure you want to delete this expense?')) {
-      const success = deleteExpense(user.id, expenseId)
-      if (success) {
-        loadExpenses()
+      const result = await deleteExpense(expenseId)
+      if (result.success) {
+        await loadExpenses()
+      } else {
+        alert('Error deleting expense: ' + result.error)
       }
     }
   }
@@ -61,6 +82,10 @@ const Dashboard = ({ user }) => {
     } else {
       handleAddExpense(expenseData)
     }
+  }
+
+  if (loading) {
+    return <div className="loading">Loading expenses...</div>
   }
 
   return (

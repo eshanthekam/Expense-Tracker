@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { registerUser } from '../../firebase/auth'
 
 const Register = ({ onRegister, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
     confirmPassword: ''
   })
@@ -18,8 +19,8 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
   }
 
   const validateForm = () => {
-    if (formData.username.length < 3) {
-      setError('Username must be at least 3 characters long')
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address')
       return false
     }
     
@@ -47,36 +48,13 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
     setIsLoading(true)
 
     try {
-      // Get stored users
-      const storedUsers = JSON.parse(localStorage.getItem('users') || '[]')
+      const result = await registerUser(formData.email, formData.password)
       
-      // Check if username already exists
-      const existingUser = storedUsers.find(u => u.username === formData.username)
-      
-      if (existingUser) {
-        setError('Username already exists. Please choose a different one.')
-        return
+      if (result.success) {
+        onRegister(result.user)
+      } else {
+        setError(result.error)
       }
-
-      // Create new user
-      const newUser = {
-        id: Date.now().toString(),
-        username: formData.username,
-        password: formData.password,
-        createdAt: new Date().toISOString()
-      }
-
-      // Add user to storage
-      storedUsers.push(newUser)
-      localStorage.setItem('users', JSON.stringify(storedUsers))
-
-      // Initialize user's expenses storage
-      localStorage.setItem(`expenses_${newUser.id}`, JSON.stringify([]))
-
-      // Remove password from user object before storing in session
-      const { password, ...userWithoutPassword } = newUser
-      onRegister(userWithoutPassword)
-      
     } catch (err) {
       setError('An error occurred. Please try again.')
     } finally {
@@ -89,15 +67,15 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
       <h3>Register</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="email">Email</label>
           <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             required
-            placeholder="Choose a username"
+            placeholder="Enter your email"
           />
         </div>
         

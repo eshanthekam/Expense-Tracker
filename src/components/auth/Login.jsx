@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { loginUser } from '../../firebase/auth'
 
 const Login = ({ onLogin, onSwitchToRegister }) => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   })
   const [error, setError] = useState('')
@@ -22,21 +23,12 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
     setIsLoading(true)
 
     try {
-      // Get stored users
-      const storedUsers = JSON.parse(localStorage.getItem('users') || '[]')
+      const result = await loginUser(formData.email, formData.password)
       
-      // Find user
-      const user = storedUsers.find(u => 
-        u.username === formData.username && 
-        u.password === formData.password
-      )
-
-      if (user) {
-        // Remove password from user object before storing in session
-        const { password, ...userWithoutPassword } = user
-        onLogin(userWithoutPassword)
+      if (result.success) {
+        onLogin(result.user)
       } else {
-        setError('Invalid username or password')
+        setError(result.error)
       }
     } catch (err) {
       setError('An error occurred. Please try again.')
@@ -50,15 +42,15 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
       <h3>Login</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="email">Email</label>
           <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             required
-            placeholder="Enter your username"
+            placeholder="Enter your email"
           />
         </div>
         

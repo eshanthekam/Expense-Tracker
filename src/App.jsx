@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { onAuthStateChange, logoutUser } from './firebase/auth'
+import { testFirebaseConnection } from './firebase/test'
 import AuthContainer from './components/auth/AuthContainer'
 import Dashboard from './components/dashboard/Dashboard'
+import ThemeToggle from './components/common/ThemeToggle'
+import FirebaseDebug from './components/debug/FirebaseDebug'
+import QuickFirebaseTest from './components/debug/QuickFirebaseTest'
 import './App.css'
 
 function App() {
@@ -9,6 +13,14 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Test Firebase connection first
+    testFirebaseConnection().then(result => {
+      if (!result.success) {
+        console.error('Firebase connection failed:', result.error)
+        alert(`Firebase connection failed: ${result.error}`)
+      }
+    })
+
     // Listen to Firebase auth state changes
     const unsubscribe = onAuthStateChange((user) => {
       setCurrentUser(user)
@@ -44,17 +56,22 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Expense Tracker</h1>
-        {currentUser && (
-          <div className="user-info">
-            <span>Welcome, {currentUser.email}!</span>
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
-          </div>
-        )}
+        <div className="header-controls">
+          <ThemeToggle />
+          {currentUser && (
+            <div className="user-info">
+              <span>Welcome, {currentUser.email}!</span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
       
       <main className="app-main">
+        <FirebaseDebug />
+        <QuickFirebaseTest />
         {!currentUser ? (
           <AuthContainer 
             onLogin={handleLogin}

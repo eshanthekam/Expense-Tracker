@@ -9,7 +9,9 @@ import { auth } from './config'
 // Register a new user
 export const registerUser = async (email, password) => {
   try {
+    console.log('Attempting to register user:', email)
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+    console.log('User registered successfully:', userCredential.user.uid)
     return {
       success: true,
       user: {
@@ -19,6 +21,7 @@ export const registerUser = async (email, password) => {
       }
     }
   } catch (error) {
+    console.error('Registration error:', error.code, error.message)
     return {
       success: false,
       error: error.message
@@ -29,7 +32,9 @@ export const registerUser = async (email, password) => {
 // Login user
 export const loginUser = async (email, password) => {
   try {
+    console.log('Attempting to login user:', email)
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    console.log('User logged in successfully:', userCredential.user.uid)
     return {
       success: true,
       user: {
@@ -39,6 +44,7 @@ export const loginUser = async (email, password) => {
       }
     }
   } catch (error) {
+    console.error('Login error:', error.code, error.message)
     return {
       success: false,
       error: error.message

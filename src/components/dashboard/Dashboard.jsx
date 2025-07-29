@@ -3,9 +3,15 @@ import { getUserExpenses, addExpense, updateExpense, deleteExpense, getExpenseSt
 import { formatCurrency } from '../../utils/expenseUtils'
 import ExpenseForm from '../expenses/ExpenseForm'
 import ExpenseList from '../expenses/ExpenseList'
+import ExpenseFilter from '../expenses/ExpenseFilter'
+import ExpenseCharts from './ExpenseCharts'
+import BudgetManager from '../budget/BudgetManager'
+import ExpenseReports from '../reports/ExpenseReports'
+import RecurringExpenses from '../expenses/RecurringExpenses'
 
 const Dashboard = ({ user }) => {
   const [expenses, setExpenses] = useState([])
+  const [filteredExpenses, setFilteredExpenses] = useState([])
   const [stats, setStats] = useState({ total: '0.00', count: 0, byCategory: {} })
   const [showForm, setShowForm] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
@@ -23,6 +29,7 @@ const Dashboard = ({ user }) => {
       if (result.success) {
         console.log("Expenses loaded successfully:", result.expenses)
         setExpenses(result.expenses)
+        setFilteredExpenses(result.expenses)
         
         // Load stats
         const statsResult = await getExpenseStats(user.uid)
@@ -124,22 +131,21 @@ const Dashboard = ({ user }) => {
         </div>
       </div>
 
-      {/* Category Breakdown */}
-      {Object.keys(stats.byCategory).length > 0 && (
-        <div className="category-breakdown">
-          <h3>Spending by Category</h3>
-          <div className="category-list">
-            {Object.entries(stats.byCategory)
-              .sort(([,a], [,b]) => b - a)
-              .map(([category, amount]) => (
-                <div key={category} className="category-item">
-                  <span className="category-name">{category}</span>
-                  <span className="category-amount">{formatCurrency(amount)}</span>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
+      {/* Charts Section */}
+      <ExpenseCharts expenses={expenses} stats={stats} />
+      
+      {/* Budget Management Section */}
+      <BudgetManager user={user} expenses={expenses} stats={stats} />
+      
+      {/* Reports Section */}
+      <ExpenseReports expenses={expenses} stats={stats} />
+      
+      {/* Recurring Expenses Section */}
+      <RecurringExpenses 
+        user={user} 
+        expenses={expenses} 
+        onAddExpense={handleAddExpense}
+      />
 
       {/* Expense Form Modal */}
       {showForm && (
@@ -154,9 +160,15 @@ const Dashboard = ({ user }) => {
         </div>
       )}
 
+      {/* Expense Filter */}
+      <ExpenseFilter 
+        expenses={expenses}
+        onFilterChange={setFilteredExpenses}
+      />
+
       {/* Expense List */}
       <ExpenseList
-        expenses={expenses}
+        expenses={filteredExpenses}
         onEdit={handleEditExpense}
         onDelete={handleDeleteExpense}
       />

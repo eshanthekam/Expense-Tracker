@@ -1,25 +1,40 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { getAnalytics } from 'firebase/analytics'
 
 // Your Firebase configuration
-// Replace this with your actual Firebase config from the Firebase Console
 const firebaseConfig = {
   apiKey: "AIzaSyC51YoKwQahCb0wl4rF_ft75i5ASYTTFHY",
   authDomain: "expense-tracker-web-24c1c.firebaseapp.com",
   projectId: "expense-tracker-web-24c1c",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-project-id.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-messaging-sender-id",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id"
+  storageBucket: "expense-tracker-web-24c1c.firebasestorage.app",
+  messagingSenderId: "514276983098",
+  appId: "1:514276983098:web:f4b494c1b06c44784c5003",
+  measurementId: "G-JP6YB77HCS"
 }
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig)
+let app
+let auth
+let db
+let analytics
 
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app)
+try {
+  app = initializeApp(firebaseConfig)
+  auth = getAuth(app)
+  db = getFirestore(app)
+  analytics = getAnalytics(app)
+  
+  console.log('✅ Firebase initialized successfully with config:', {
+    apiKey: firebaseConfig.apiKey,
+    authDomain: firebaseConfig.authDomain,
+    projectId: firebaseConfig.projectId
+  })
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error)
+  throw error
+}
 
-// Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app)
-
+export { auth, db, analytics }
 export default app 

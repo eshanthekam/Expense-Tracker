@@ -1471,23 +1471,23 @@ body {
 
 /* Dark Mode Styles */
 .dark-mode {
-  --bg-primary: #0f0f0f;
+  --bg-primary: #0a0a0a;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #2d2d2d;
   --text-primary: #ffffff;
   --text-secondary: #e0e0e0;
   --text-muted: #b0b0b0;
   --border-color: #404040;
-  --shadow-color: rgba(0, 0, 0, 0.5);
-  --accent-color: #7c3aed;
-  --accent-hover: #6d28d9;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --accent-color: #8b5cf6;
+  --accent-hover: #7c3aed;
   --danger-color: #ef4444;
   --success-color: #10b981;
   --warning-color: #f59e0b;
 }
 
 .dark-mode body {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   color: var(--text-primary);
 }
 
@@ -1497,8 +1497,9 @@ body {
 }
 
 .dark-mode .app-header {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
-  box-shadow: 0 4px 20px var(--shadow-color);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  box-shadow: 0 8px 32px var(--shadow-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dark-mode .app-main {
@@ -1597,8 +1598,9 @@ body {
 .dark-mode select:focus,
 .dark-mode textarea:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
   background: var(--bg-tertiary);
+  transform: translateY(-1px);
 }
 
 .dark-mode .search-field::placeholder,
@@ -1707,6 +1709,19 @@ body {
 
 .dark-mode .custom-tooltip .value {
   color: var(--accent-color);
+}
+
+/* Dark mode theme toggle */
+.dark-mode .theme-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+.dark-mode .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
 }
 
 @media (max-width: 480px) {

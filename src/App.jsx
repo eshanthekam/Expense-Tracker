@@ -4,8 +4,6 @@ import { testFirebaseConnection } from './firebase/test'
 import AuthContainer from './components/auth/AuthContainer'
 import Dashboard from './components/dashboard/Dashboard'
 import ThemeToggle from './components/common/ThemeToggle'
-import FirebaseDebug from './components/debug/FirebaseDebug'
-import QuickFirebaseTest from './components/debug/QuickFirebaseTest'
 import './App.css'
 
 function App() {
@@ -70,8 +68,6 @@ function App() {
       </header>
       
       <main className="app-main">
-        <FirebaseDebug />
-        <QuickFirebaseTest />
         {!currentUser ? (
           <AuthContainer 
             onLogin={handleLogin}
